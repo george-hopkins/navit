@@ -50,7 +50,7 @@
 			<xsl:copy-of select="navigation"/>
 
 			<xsl:comment>Use espeak.</xsl:comment>
-			<speech type="cmdline" data="/mnt/sdcard/navit/bin/espeakdsp -v en '%s'"/>
+			<speech type="cmdline" data="/mnt/sdcard/opentom/bin/espeakdsp -v en '%s'"/>
 
 			<mapset enabled="yes">
 				<map type="binfile" enabled="yes" data="$NAVIT_SHAREDIR/maps/*.bin"/>
