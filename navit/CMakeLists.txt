@@ -147,9 +147,15 @@ if(ANDROID)
    add_custom_target( navit_config_xml ALL DEPENDS navitxxxhdpi.xml navitxxhdpi.xml navitxhdpi.xml navithdpi.xml navitmdpi.xml navitldpi.xml)
 else()
    process_xslt(${CMAKE_CURRENT_SOURCE_DIR}/navit_shipped.xml ${CMAKE_CURRENT_BINARY_DIR}/navit.xml "")
-   add_custom_target( navit_config_xml_resource DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/navit.xml COMMAND mkdir -p resources/share/navit COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/navit.xml resources/share/navit)
+   compose_xslt_transform_command(TOMTOM_XL_CMD "${PROJECT_SOURCE_DIR}/navit/xslt/tomtom_xl.xslt" "${CMAKE_CURRENT_BINARY_DIR}/navit.xml" "${CMAKE_CURRENT_BINARY_DIR}/navit_xl.xml")
+   ADD_CUSTOM_COMMAND(
+      OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/navit_xl.xml
+      DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/navit.xml ${PROJECT_SOURCE_DIR}/navit/xslt/tomtom_xl.xslt
+      ${TOMTOM_XL_CMD}
+   )
+   add_custom_target( navit_config_xml_resource DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/navit.xml COMMAND mkdir -p resources/share/navit COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/navit.xml ${CMAKE_CURRENT_BINARY_DIR}/navit_xl.xml resources/share/navit)
    add_custom_target( locale_resource DEPENDS locales COMMAND mkdir -p resources/share COMMAND cp -a ${CMAKE_CURRENT_BINARY_DIR}/../locale resources/share/locale)
-   add_custom_target( navit_config_xml ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/navit.xml)
+   add_custom_target( navit_config_xml ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/navit.xml ${CMAKE_CURRENT_BINARY_DIR}/navit_xl.xml)
 endif()
 
 ADD_DEPENDENCIES(${NAVIT_LIBNAME} git_version)
@@ -169,7 +175,7 @@ install(TARGETS navit
         DESTINATION ${BIN_DIR}
         PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/navit.xml
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/navit.xml ${CMAKE_CURRENT_BINARY_DIR}/navit_xl.xml
         DESTINATION ${SHARE_DIR}
         PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)
 
